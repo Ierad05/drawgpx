@@ -1,8 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
   margin: 0;

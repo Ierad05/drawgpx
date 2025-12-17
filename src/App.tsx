@@ -77,37 +77,39 @@ function App() {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col font-sans">
-      <header className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] w-full max-w-md px-4 pointer-events-none">
-        <div className="bg-white/90 backdrop-blur-md shadow-xl rounded-2xl p-6 pointer-events-auto border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+    <div className="h-screen w-screen flex flex-col font-sans text-gray-900">
+      <header className="absolute top-6 left-6 z-[1000] w-full max-w-sm pointer-events-none">
+        <div className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-6 pointer-events-auto ring-1 ring-black/5">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-br from-gray-900 to-gray-600 bg-clip-text text-transparent">
               DrawGPX
             </h1>
-            <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
-              Core
+            <div className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase">
+              BETA
             </div>
           </div>
 
-          <div className="space-y-4">
-            {/* Controls */}
-            <div className="flex gap-2">
+          <div className="space-y-5">
+            {/* Primary Actions */}
+            <div className="flex gap-3">
               {mode === 'view' && (points.length === 0) && (
                 <button
                   onClick={handleStartDrawing}
                   disabled={isLoading}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50"
+                  className="flex-1 bg-gray-900 hover:bg-black text-white py-3 px-6 rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-gray-200 active:scale-[0.98] disabled:opacity-50 font-medium"
                 >
-                  <Pencil size={18} /> Draw Shape
+                  <Pencil size={18} strokeWidth={2.5} />
+                  <span>Start Drawing</span>
                 </button>
               )}
 
               {mode === 'draw' && (
                 <button
                   onClick={handleFinishDrawing}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95"
+                  className="flex-1 bg-black hover:bg-gray-900 text-white py-3 px-6 rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-lg active:scale-[0.98] font-medium"
                 >
-                  <Check size={18} /> Finish Shape
+                  <Check size={18} strokeWidth={2.5} />
+                  <span>Done</span>
                 </button>
               )}
 
@@ -115,85 +117,83 @@ function App() {
                 <button
                   onClick={handleClear}
                   disabled={isLoading}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded-xl transition-all disabled:opacity-50"
+                  className="group bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 p-3 rounded-2xl transition-all border border-transparent hover:border-red-100 active:scale-95 disabled:opacity-50"
                   title="Clear"
                 >
-                  <Trash2 size={20} />
+                  <Trash2 size={20} strokeWidth={2} className="group-hover:scale-110 transition-transform" />
                 </button>
               )}
             </div>
 
-            {/* Stats */}
-            {points.length > 2 && (
-              <div className="text-center text-sm text-gray-500">
-                {mode === 'generated' && routePath.length > 0 ? (
-                  <>
-                    Target: {distance} km | Route: <span className="font-bold text-emerald-600">{calculateDistance(routePath).toFixed(2)} km</span>
-                  </>
-                ) : (
-                  <>Current Shape: <span className="font-semibold text-gray-800">{currentPerimeter.toFixed(2)} km</span></>
-                )}
+            {/* Stats Display */}
+            <div className={`transition-all duration-300 overflow-hidden ${points.length > 2 ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'}`}>
+              <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-500">
+                  {mode === 'generated' ? 'Route Length' : 'Shape Perimeter'}
+                </span>
+                <span className="text-xl font-bold tracking-tight text-gray-900">
+                  {(mode === 'generated' && routePath.length > 0 ? calculateDistance(routePath) : currentPerimeter).toFixed(2)}
+                  <span className="text-sm font-medium text-gray-400 ml-1">km</span>
+                </span>
               </div>
-            )}
+            </div>
 
-            {/* Settings Grid */}
-            <div className="grid grid-cols-2 gap-3">
-              {/* Distance Input */}
-              <div className="relative">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Target Distance</label>
-                <div className="flex items-center gap-2">
+            {/* Settings */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider pl-1">Target Distance</label>
+                <div className="relative group">
                   <input
                     type="number"
                     value={distance}
                     onChange={(e) => setDistance(Number(e.target.value))}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-medium text-gray-800"
+                    className="w-full bg-gray-50 hover:bg-gray-100 focus:bg-white border-0 rounded-xl px-4 py-3 font-semibold text-gray-900 focus:ring-2 focus:ring-black/5 transition-all outline-none"
                   />
-                  <span className="text-gray-500 font-medium">km</span>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-400 pointer-events-none group-focus-within:text-gray-600 transition-colors">km</span>
                 </div>
               </div>
 
-              {/* Profile Selector */}
-              <div className="relative">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Mode</label>
-                <div className="flex bg-gray-50 border border-gray-200 rounded-xl p-1">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider pl-1">Activity</label>
+                <div className="flex bg-gray-50 p-1 rounded-xl">
                   <button
                     onClick={() => setProfile('foot')}
-                    className={`flex - 1 flex items - center justify - center py - 1.5 rounded - lg text - sm transition - all ${profile === 'foot' ? 'bg-white shadow-sm text-indigo-600 font-semibold' : 'text-gray-500 hover:text-gray-700'} `}
-                    title="Walking / Mixed"
+                    className={`flex-1 flex items-center justify-center py-2 rounded-lg transition-all ${profile === 'foot' ? 'bg-white shadow-sm ring-1 ring-black/5 text-black' : 'text-gray-400 hover:text-gray-600'}`}
                   >
-                    <Footprints size={18} />
+                    <Footprints size={18} strokeWidth={2.5} />
                   </button>
                   <button
                     onClick={() => setProfile('bike')}
-                    className={`flex - 1 flex items - center justify - center py - 1.5 rounded - lg text - sm transition - all ${profile === 'bike' ? 'bg-white shadow-sm text-indigo-600 font-semibold' : 'text-gray-500 hover:text-gray-700'} `}
-                    title="Road Bike"
+                    className={`flex-1 flex items-center justify-center py-2 rounded-lg transition-all ${profile === 'bike' ? 'bg-white shadow-sm ring-1 ring-black/5 text-black' : 'text-gray-400 hover:text-gray-600'}`}
                   >
-                    <Bike size={18} />
+                    <Bike size={18} strokeWidth={2.5} />
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Generate Button */}
+            {/* Action Button */}
             {points.length > 2 && (mode === 'view' || mode === 'generated') && (
-              <div className="flex flex-col gap-2">
+              <div className="pt-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <button
                   onClick={handleGenerate}
                   disabled={isLoading}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold shadow-lg shadow-indigo-200 active:scale-[0.98] transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold shadow-xl shadow-blue-200/50 active:scale-[0.98] transition-all disabled:opacity-80 flex items-center justify-center gap-3 relative overflow-hidden group"
                 >
                   {isLoading ? (
-                    <> <Loader2 className="animate-spin" size={20} /> Generating Route... </>
+                    <Loader2 className="animate-spin" size={20} />
                   ) : (
-                    mode === 'generated' ? 'Regenerate' : 'Scale & Match Route'
+                    mode === 'generated' ? 'Regenerate Route' : 'Match to Roads'
                   )}
                 </button>
+
                 {mode === 'generated' && routePath.length > 0 && !isLoading && (
                   <button
                     onClick={handleDownload}
-                    className="w-full bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 py-2 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                    className="mt-3 w-full bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 py-3 rounded-2xl font-semibold transition-all flex items-center justify-center gap-2 active:scale-[0.99]"
                   >
-                    <Download size={18} /> Download GPX
+                    <Download size={18} strokeWidth={2.5} />
+                    <span>Download GPX</span>
                   </button>
                 )}
               </div>
