@@ -2,12 +2,13 @@ import axios from 'axios';
 import L from 'leaflet';
 
 const OSRM_ROOT = 'https://router.project-osrm.org';
-const PROFILE = 'foot'; // or 'bike'
 
 // OSRM Public API limits: ~25 coordinates per request is safe.
 const CHUNK_SIZE = 20;
 
-export const getSmartRoute = async (points: L.LatLng[]): Promise<L.LatLng[]> => {
+export type RouteProfile = 'foot' | 'bike';
+
+export const getSmartRoute = async (points: L.LatLng[], profile: RouteProfile = 'foot'): Promise<L.LatLng[]> => {
     if (points.length < 2) return [];
 
     // Break points into overlapping chunks
@@ -24,7 +25,7 @@ export const getSmartRoute = async (points: L.LatLng[]): Promise<L.LatLng[]> => 
     try {
         // Execute requests sequentially (or parallel, but OSRM might rate limit parallel, sequential is safer for order)
         for (const chunk of chunks) {
-            const chunkRoute = await fetchRouteSegment(chunk);
+            const chunkRoute = await fetchRouteSegment(chunk, profile);
             if (chunkRoute.length === 0) {
                 // If a segment fails, we might have a gap. 
                 // Fallback: just straight line connect (or ignore? straight line is better UI)
@@ -52,13 +53,13 @@ export const getSmartRoute = async (points: L.LatLng[]): Promise<L.LatLng[]> => 
     }
 };
 
-const fetchRouteSegment = async (points: L.LatLng[]): Promise<L.LatLng[]> => {
+const fetchRouteSegment = async (points: L.LatLng[], profile: RouteProfile): Promise<L.LatLng[]> => {
     // Format: lon,lat;lon,lat
     const coordinatesString = points
         .map(p => `${p.lng},${p.lat}`)
         .join(';');
 
-    const url = `${OSRM_ROOT}/route/v1/${PROFILE}/${coordinatesString}?overview=full&geometries=geojson`;
+    const url = `${OSRM_ROOT}/route/v1/${profile}/${coordinatesString}?overview=full&geometries=geojson`;
 
     try {
         const response = await axios.get(url);

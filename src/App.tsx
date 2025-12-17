@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import MapComponent from './components/MapComponent';
 import { LatLng } from 'leaflet';
-import { Pencil, Trash2, Check, Loader2, Download } from 'lucide-react';
+import { Pencil, Trash2, Check, Loader2, Download, Bike, Footprints } from 'lucide-react';
 import { scaleShape, calculateDistance, resampleShape } from './utils/geometry';
-import { getSmartRoute } from './utils/api';
+import { getSmartRoute, type RouteProfile } from './utils/api';
 import { downloadGPX } from './utils/gpx';
 
 type Mode = 'view' | 'draw' | 'generated';
@@ -15,6 +14,7 @@ function App() {
   const [routePath, setRoutePath] = useState<LatLng[]>([]);
   const [distance, setDistance] = useState<number>(5); // Target km
   const [currentPerimeter, setCurrentPerimeter] = useState<number>(0);
+  const [profile, setProfile] = useState<RouteProfile>('foot');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -64,7 +64,7 @@ function App() {
     const resampled = resampleShape(scaled, numPoints);
 
     // 3. Fetch Route (Match)
-    const route = await getSmartRoute(resampled);
+    const route = await getSmartRoute(resampled, profile);
     setRoutePath(route);
 
     setMode('generated');
@@ -136,17 +136,41 @@ function App() {
               </div>
             )}
 
-            {/* Distance Input */}
-            <div className="relative">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Target Distance</label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  value={distance}
-                  onChange={(e) => setDistance(Number(e.target.value))}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-medium text-gray-800"
-                />
-                <span className="text-gray-500 font-medium">km</span>
+            {/* Settings Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              {/* Distance Input */}
+              <div className="relative">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Target Distance</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={distance}
+                    onChange={(e) => setDistance(Number(e.target.value))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-medium text-gray-800"
+                  />
+                  <span className="text-gray-500 font-medium">km</span>
+                </div>
+              </div>
+
+              {/* Profile Selector */}
+              <div className="relative">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Mode</label>
+                <div className="flex bg-gray-50 border border-gray-200 rounded-xl p-1">
+                  <button
+                    onClick={() => setProfile('foot')}
+                    className={`flex - 1 flex items - center justify - center py - 1.5 rounded - lg text - sm transition - all ${profile === 'foot' ? 'bg-white shadow-sm text-indigo-600 font-semibold' : 'text-gray-500 hover:text-gray-700'} `}
+                    title="Walking / Mixed"
+                  >
+                    <Footprints size={18} />
+                  </button>
+                  <button
+                    onClick={() => setProfile('bike')}
+                    className={`flex - 1 flex items - center justify - center py - 1.5 rounded - lg text - sm transition - all ${profile === 'bike' ? 'bg-white shadow-sm text-indigo-600 font-semibold' : 'text-gray-500 hover:text-gray-700'} `}
+                    title="Road Bike"
+                  >
+                    <Bike size={18} />
+                  </button>
+                </div>
               </div>
             </div>
 
