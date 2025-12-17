@@ -16,9 +16,9 @@ export const scaleShape = (points: L.LatLng[], targetDistanceKm: number): L.LatL
 
     const scaleFactor = targetDistanceKm / currentDistanceKm;
 
-    // Scale the shape relative to its centroid
+    // Scale the shape relative to its start point
     const polygon = turf.polygon([coordinates]);
-    const scaledPoly = turf.transformScale(polygon, scaleFactor);
+    const scaledPoly = turf.transformScale(polygon, scaleFactor, { origin: coordinates[0] });
 
     // Get the coordinates back
     // Type assertion or check needed because transformScale returns a Feature
